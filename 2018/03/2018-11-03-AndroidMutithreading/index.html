@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Android多线程编程(Multithreading) | Hmmmi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+    <link rel="icon" href="/avatar-default.png">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+  
+  <meta name="description" content="当我们需要执行一些耗时的操作，比如说发起网络请求，考虑到服务器未必会立刻响应我们地请求，如果不将操作放置到子线程中就会导致主线程的阻塞，使得软件无法正常运行。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android多线程编程(Multithreading)">
+<meta property="og:url" content="https://hmmmi.github.io/2018/03/2018-11-03-AndroidMutithreading/index.html">
+<meta property="og:site_name" content="Hmmmi">
+<meta property="og:description" content="当我们需要执行一些耗时的操作，比如说发起网络请求，考虑到服务器未必会立刻响应我们地请求，如果不将操作放置到子线程中就会导致主线程的阻塞，使得软件无法正常运行。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2018/11/thread.png">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2018/11/handler.png">
+<meta property="article:published_time" content="2018-11-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-09-18T13:35:08.346Z">
+<meta property="article:author" content="Hmmmi">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Multithreading">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hmmmi.github.io/imgForArc/2018/11/thread.png"><meta name="generator" content="Hexo 5.1.1"></head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1 id="title">
+    <a href="/">Hmmmi</a>
+  </h1>
+  <nav>
+    
+    
+      
+      <a class="nav-link" href="/">Home</a>
+    
+      
+        <span class="nav-spacer">×</span>
+      
+      <a class="nav-link" href="/archives">Archives</a>
+    
+      
+        <span class="nav-spacer">×</span>
+      
+      <a class="nav-link" target="_blank" rel="noopener" href="https://github.com/hmmmi">GitHub</a>
+    
+    
+  </nav>
+</header>
+
+    <div id="content">
+      <article id="post-2018-11-03-AndroidMutithreading" class="article article-type-post" itemprop="blogPost" itemscope>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h2 class="article-title" itemprop="headline name">
+      Android多线程编程(Multithreading)
+    </h2>
+  
+
+
+        <div class="article-meta">
+          <time 
+		class="article-date" 
+		datetime="2018-11-02T16:00:00.000Z" 
+		itemprop="datePublished">
+	November 3, 2018
+
+</time>
+
+          
+            &nbsp;×&nbsp; <span class="article-word-count">1.1k words</span>
+            
+            &nbsp;×&nbsp; <span class="article-time-to-read">4 minutes</span>
+            
+          
+        </div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        <blockquote>
+<p>当我们需要执行一些耗时的操作，比如说发起网络请求，考虑到服务器未必会立刻响应我们地请求，如果不将操作放置到子线程中就会导致主线程的阻塞，使得软件无法正常运行。</p>
+</blockquote>
+<h3 id="线程和主线程"><a href="#线程和主线程" class="headerlink" title="线程和主线程"></a><strong><font size=6>线程和主线程</font></strong></h3><p><font color="Red">线程是个单一执行序列</font>，单个线程中的代码会逐步执行。所有Android应用的运行都是从主线程开始的。然而，<font color="Red">主线程</font>不是线程那样的预定执行序列，<font color="Red">它处于一个无限循环的运行状态</font>，等着用户或系触发事件。一旦有事件触发，主线程便执行代码作出响应。<br>主线程运行着所有更新UI的代码，其中包括响应activity的启动、按钮点击等不同UI相关事件的代码。由于响应的事件基本都与用户界面相关，<font color="DarkRed">主线程也叫UI线程</font>。</p>
+<p><img src="/imgForArc/2018/11/thread.png" alt="thread"></p>
+<h4 id="Thread-in-Java"><a href="#Thread-in-Java" class="headerlink" title="Thread in Java"></a><strong><font face="Bradley Hand ITC" size=5>Thread in Java</font></strong></h4><p>In java, a thread is represented by an object belonging to the subclass of java.lang.Thread and overrides its run() method, or a class that implements the Runnable interface, which has one method run().</p>
+<p>The thread is created by instantiating the class Thread or the subclass of Thread. When the start() method of a thread object is invoked, it starts the concurrent execution of the thread along with the execution of its parent thread.</p>
+<p>For example: </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">new Thread(runnable).start();</span><br></pre></td></tr></table></figure>
+</br>
+### <strong><font size=6>子线程与主线程通讯机制</font></strong>
+因为Android的UI是线程不安全的，所以Android的UI默认是在主线程里面更新。
+那当我们子线程获取到数据后需要更新UI怎么办呢，子线程是不能操作UI的，会报错，这个时候子线程要做的就是通知主线程操作UI。
+Android中的异步消息处理机制主要由四个部分构成：Message、Handler、MessageQueue和Looper。
+</br>
+#### <strong><font face="Bradley Hand ITC" size=5>Message（消息）</font></strong>
+Message是在线程之间传递的消息，它可以在内部携带少量的信息。
+Message对象实例用五个变量可以自定义：
+- what ( int ) : 用户定义的int型消息代码，用来描述消息
+- obj ( Object ) : 用户指定，随消息发送的对象
+- target ( Handler ) : 处理消息的Handler
+- arg1 & arg2 ( int ) : 携带其他整型数据
+</br>
+
+<h4 id="Handler（消息处理）"><a href="#Handler（消息处理）" class="headerlink" title="Handler（消息处理）"></a><strong><font face="Bradley Hand ITC" size=5>Handler（消息处理）</font></strong></h4><p>Handler不仅仅是处理Message的target（目标），也是创建和发布Message的接口。<br><img src="/imgForArc/2018/11/handler.png" alt="handler"></p>
+<h4 id="MessageQueue（线程使用的收件箱）"><a href="#MessageQueue（线程使用的收件箱）" class="headerlink" title="MessageQueue（线程使用的收件箱）"></a><strong><font face="Bradley Hand ITC" size=5>MessageQueue（线程使用的收件箱）</font></strong></h4><p>消息队列，用于存放所有通过Handler发送的消息，这部分消息会存在于消息队列中，等待被处理。每个线程只会有一个MessageQueue对象。<br></br></p>
+<h4 id="Looper（消息循环）"><a href="#Looper（消息循环）" class="headerlink" title="Looper（消息循环）"></a><strong><font face="Bradley Hand ITC" size=5>Looper（消息循环）</font></strong></h4><p>Looper是每个线程中的MessageQueue的管家。调用Looper的loop()方法后，就会进入到一个无限循环当中，然后每当发现MessageQueue中存在一条消息，就会将它取出，并传递到Handler的handerMessage（）方法中。每个线程只有一个Looper对象。<br>Looper拥有Message对象的收件箱，所以Message必须在Looper上发布和处理。既然有这层关系，为了协同工作，Handler总引用着Looper，一个Handler仅与一个Looper相关联。一个Message也仅与一个目标Handler相关联。<br></br></p>
+<h3 id="Handler的使用"><a href="#Handler的使用" class="headerlink" title="Handler的使用"></a><strong><font size=6>Handler的使用</font></strong></h3><p>一般来讲，不应手动设置消息的目标Handler。创建信息时，最好调用Handler.obtainMessage(…)方法。传入其他必要消息字段后，该方法会自动设置目标Handler。<br>（我不知道我为什么抽风要把这个写上，因为一般都不是这么用的）<br></br></p>
+<h4 id="创建Handler对象"><a href="#创建Handler对象" class="headerlink" title="创建Handler对象"></a><strong><font face="Bradley Hand ITC" size=5>创建Handler对象</font></strong></h4><p>设置了3个int型常量，用来区分不同的事件。然后针对不同的事件来做相应的UI操作。这里主要是对RecyclerView的操作和会话列表数据加载完成后对加载动画的操作。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">private static final int DATA_CHANGED &#x3D; 1;&#x2F;&#x2F;数据集更新</span><br><span class="line">private static final int DATA_INSERTED &#x3D; -1;&#x2F;&#x2F;数据集插入</span><br><span class="line">private static final int SET_DATA &#x3D; 2;&#x2F;&#x2F;数据集插入</span><br><span class="line"></span><br><span class="line">Handler handler &#x3D; new Handler()&#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void handleMessage(android.os.Message msg) &#123;</span><br><span class="line">        super.handleMessage(msg);</span><br><span class="line">        switch (msg.what)&#123;</span><br><span class="line">            case DATA_CHANGED:</span><br><span class="line">                chatListAdapter.notifyDataSetChanged();</span><br><span class="line">                break;</span><br><span class="line">            case DATA_INSERTED:</span><br><span class="line">                chatListAdapter.notifyItemInserted(msg.arg1);</span><br><span class="line">                chatListRv.scrollToPosition(chatListItems.size()-1);</span><br><span class="line">                break;</span><br><span class="line">            case SET_DATA:</span><br><span class="line">                ChatListDAO.setChatList(chatListItems);</span><br><span class="line">                chatListAdapter &#x3D; new ChatListAdapter(chatListItems);</span><br><span class="line">                chatListRv.setAdapter(chatListAdapter);</span><br><span class="line">                &#x2F;&#x2F;refreshData完成后关闭加载动画，并将其隐藏</span><br><span class="line">                loadingImg.clearAnimation();</span><br><span class="line">                loadingLayout.setVisibility(View.GONE);</span><br><span class="line">                break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</br>
+#### <strong><font face="Bradley Hand ITC" size=5>向主线程发送消息</font></strong>
+子线程执行完后，发送消息到handler，由handler进行相关UI操作。
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">android.os.Message message &#x3D; new android.os.Message();</span><br><span class="line">message.what &#x3D; SET_DATA;</span><br><span class="line">handler.sendMessage(message);</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    <div class="article-category">
+      
+        <b>Categories:</b>
+        <a class="article-category-link" href="/categories/Android/">Android</a>
+      
+      
+        <br/>
+      
+      
+        <b>Tags:</b>
+        <a class="article-tag-none-link" href="/tags/Android/" rel="tag">Android</a>, <a class="article-tag-none-link" href="/tags/Multithreading/" rel="tag">Multithreading</a>
+      
+    </div>
+    
+    
+  </div>
+</article>
+
+  
+<nav id="article-nav" class="article-nav">
+  
+    <a href="/2018/31/2018-12-31-%E4%B8%80%E4%B8%AA%E5%AD%97%E7%9C%9F%E7%9A%84%E8%83%BD%E6%80%BB%E7%BB%93%E8%BF%99%E4%B8%80%E5%B9%B4%E5%90%97/" id="article-nav-newer" class="article-nav-link-wrap newer">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          一个字真的能总结这一年吗
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/01/2018-11-01-quiet/" id="article-nav-older" class="article-nav-link-wrap older">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">
+        
+          我不知道该写什么，我想平静地面对这一切
+        
+      </div>
+    </a>
+  
+</nav>
+
+
+
+
+
+
+    </div>
+  </div>
+  
+
+
+
+
+<div id="settings-container">
+  <div id="dark-mode">dark</div>
+  <div id="sans-font">sans</div>
+</div>
+<script type="text/javascript">
+let d=document,r=d.documentElement.style,f=r.setProperty.bind(r),l=localStorage,s=l.getItem('s')||(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches),n=l.getItem('n'),m=d.getElementById("dark-mode"),b=()=>{f('--bg-color','#fafafa');f('--code-bg-color','#f4f4f4');f('--text-color','#212121');f('--secondary-color','#808080');f('--tertiary-color','#b0b0b0');f('--link-color','#b5c8cf');f('--link-hover-color','#618794');f('--link-bg-color','#dae4e7');f('--selection-color','#dae4e7');m.innerHTML="dark"},c=()=>{f('--bg-color','#212121');f('--code-bg-color','#292929');f('--text-color','#fff');f('--secondary-color','#c0c0c0');f('--tertiary-color','#6e6e6e');f('--link-color','#4d6b75');f('--link-hover-color','#96b1bb');f('--link-bg-color','#5d828e');f('--selection-color','#acc1c9');m.innerHTML="light"},o=d.getElementById("sans-font"),e=()=>{f('--body-stack','"Lora", "Georgia", "Times New Roman", serif');o.innerHTML="sans"},g=()=>{f('--body-stack','"Lato", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "Verdana", sans-serif');o.innerHTML="serif"};m.onclick=()=>{if(s==2){s=1;l.setItem('s',s);c()}else{s=2;l.setItem('s',s);b()}};o.onclick=()=>{if(n==2){n=1;l.setItem('n',n);g()}else{n=2;l.setItem('n',n);e()}};if(!s){s=2;l.setItem('s',2)};if(s==1){c()};if(!n){n=2;l.setItem('n',2)};if(n==1){g()};
+</script>
+
+
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-195210058-2', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+</body>
+</html>

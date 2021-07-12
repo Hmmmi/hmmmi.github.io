@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>基于用户兴趣隐私保护的朋友发现系统 | Hmmmi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+    <link rel="icon" href="/avatar-default.png">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+  
+  <meta name="description" content="生活中我们希望利用智能手机通过合作计算发现志趣相投的朋友，而不泄露个人兴趣信息。这种计算可以抽象化为安全多方计算 (Secure multi-party computation, SMPC)，它考虑的问题为：n个互不信任的参与方共同合作计算某函数f(x1,x2,...,xn)&#x3D;(y1,y2,...,yn)，每个参与方Pi拥有秘密输入xi，通过合作计算得到yi但不能获知任何其他信息。SMPC对于隐私">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于用户兴趣隐私保护的朋友发现系统">
+<meta property="og:url" content="https://hmmmi.github.io/2019/17/2019-07-17-seekFriend/index.html">
+<meta property="og:site_name" content="Hmmmi">
+<meta property="og:description" content="生活中我们希望利用智能手机通过合作计算发现志趣相投的朋友，而不泄露个人兴趣信息。这种计算可以抽象化为安全多方计算 (Secure multi-party computation, SMPC)，它考虑的问题为：n个互不信任的参与方共同合作计算某函数f(x1,x2,...,xn)&#x3D;(y1,y2,...,yn)，每个参与方Pi拥有秘密输入xi，通过合作计算得到yi但不能获知任何其他信息。SMPC对于隐私">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%875.PNG">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%879.PNG">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8710.PNG">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8711.PNG">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8712.PNG">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8713.PNG">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8714.PNG">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8716.PNG">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8717.PNG">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8718.PNG">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/PaillierRunTime.png">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/ElGamalRunTime.png">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8721.PNG">
+<meta property="article:published_time" content="2019-07-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-09-18T13:34:20.394Z">
+<meta property="article:author" content="Hmmmi">
+<meta property="article:tag" content="隐私保护">
+<meta property="article:tag" content="安全多方计算">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hmmmi.github.io/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%875.PNG"><meta name="generator" content="Hexo 5.1.1"></head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1 id="title">
+    <a href="/">Hmmmi</a>
+  </h1>
+  <nav>
+    
+    
+      
+      <a class="nav-link" href="/">Home</a>
+    
+      
+        <span class="nav-spacer">×</span>
+      
+      <a class="nav-link" href="/archives">Archives</a>
+    
+      
+        <span class="nav-spacer">×</span>
+      
+      <a class="nav-link" target="_blank" rel="noopener" href="https://github.com/hmmmi">GitHub</a>
+    
+    
+  </nav>
+</header>
+
+    <div id="content">
+      <article id="post-2019-07-17-seekFriend" class="article article-type-post" itemprop="blogPost" itemscope>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h2 class="article-title" itemprop="headline name">
+      基于用户兴趣隐私保护的朋友发现系统
+    </h2>
+  
+
+
+        <div class="article-meta">
+          <time 
+		class="article-date" 
+		datetime="2019-07-16T16:00:00.000Z" 
+		itemprop="datePublished">
+	July 17, 2019
+
+</time>
+
+          
+            &nbsp;×&nbsp; <span class="article-word-count">2.3k words</span>
+            
+            &nbsp;×&nbsp; <span class="article-time-to-read">8 minutes</span>
+            
+          
+        </div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        <blockquote>
+<p>生活中我们希望利用智能手机通过合作计算发现志趣相投的朋友，而不泄露个人兴趣信息。这些合作计算都可以抽象化为安全多方计算 (Secure multi-party computation, SMPC)，它考虑的问题为：n个互不信任的参与方共同合作计算某函数f(x1,x2,…,xn)=(y1,y2,…,yn)，每个参与方Pi拥有秘密输入xi，通过合作计算得到yi但不能获知任何其他信息。SMPC对于隐私保护提供了一种天然的解决方案。</p>
+<p><strong>本作品利用安全多方计算技术，设计并实现了一种基于用户兴趣隐私保护的朋友发现系统</strong>。系统针对用户通过在移动社交网络中随时分享心情、照片、活动、兴趣爱好等来不断地发现新的朋友，从而进一步扩大自己的社交范围类网络应用，且能很好保护用户兴趣爱好隐私信息不会被泄漏。通过此系统，用户可以安全寻找志趣相投的朋友而不泄漏个人兴趣爱好信息。</p>
+</blockquote>
+<h3 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a><strong><font size=6>背景介绍</font></strong></h3><h4 id="1）问题描述"><a href="#1）问题描述" class="headerlink" title="1）问题描述"></a>1）问题描述</h4><p>生活中我们经常通过社交软件来发现志趣相投的朋友。<a target="_blank" rel="noopener" href="https://www.soulapp.cn/">Soul</a>通过用户【心理测试题结果】或【声音】的结果来发现相匹配的好友，<a target="_blank" rel="noopener" href="https://music.163.com/">网易云音乐</a>通过【歌单】来发现有相同品味的好友。这些场景属于个人信誉保密问题，转化成<strong>数学模型</strong>就是<strong>判断元素与集合关系</strong>的问题。</p>
+<h4 id="2）应用场景"><a href="#2）应用场景" class="headerlink" title="2）应用场景"></a>2）应用场景</h4><p>这类朋友发现系统的一般场景如图所示：</p>
+<p><img src="/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%875.PNG"></p>
+<p>参与计算的用户将自己的属性信息（可以是上述例子中的【测试结果】【声音】【歌单】等）提交给一个“可信”的第三方，由这个第三方计算得到结果，并把结果发送给计算发起者。</p>
+<p>但，这个第三方真的可信吗？</p>
+<h4 id="3）安全风险"><a href="#3）安全风险" class="headerlink" title="3）安全风险"></a>3）安全风险</h4><p>目前针对移动社交网络朋友发现系统的隐私保护，主要依靠可信服务第三方（Trusted Third Party, TTP）参与 。在有TTP参与的方案中，用户需要将他们的特征属性配置文件提交给TTP，由TTP作为匹配中心来计算用户之间的相似度，这种方案虽然在一定程度上解放了客户端的计算能力，在一定程度上提高了用户的匹配效率。但是依然存在以下<font color="Red"><strong>安全风险</strong></font>：</p>
+<ul>
+<li><p>第一，TTP如果被<strong>攻击者</strong>攻破，攻击者很容易可以获得TTP上的用户信息；</p>
+</li>
+<li><p>第二，完全<strong>可信的第三方并不存在</strong>，存在TTP因<strong>商业利益驱动非法访问</strong>出售用户隐私数据的风险。</p>
+<h4 id="4）作品介绍"><a href="#4）作品介绍" class="headerlink" title="4）作品介绍"></a>4）作品介绍</h4></li>
+</ul>
+<p>针对以上安全风险，我们利用安全多方计算技术设计了一种高效的集合交集安全两方计算协议，并将协议成功地应用到了朋友发现系统的核心功能模块当中。</p>
+<p>主要的工作内容如下：</p>
+<ul>
+<li><p><strong>设计了一种基于位向量的集合表示方法，能天然保护集合势的大小</strong>。 本系统中，用户兴趣集合的所有元素选自一个固定大小的数据域，则每个用户的兴趣集合可以表示为一个位向量，如果数据域中某个元素属于兴趣集合，则位向量对应位置的值为1，否则为0。由于不同的集合的位向量表示后的向量长度等于域的大小，因此这种表示方法天然隐藏了集合的势。</p>
+</li>
+<li><p><strong>设计了一种高效实用的集合交集安全两方计算协议</strong>。 基于新的集合表示方法及加法同态加密算法，我们设计了一种高效实用的集合交集安全两方计算协议。在协议的实际应用中，用户采用图2-2中的模式，在最初就选择自己的兴趣集合并加密保存到用户数据中心，好友兴趣匹配响应者也同样可以先用发起者的公钥加密许多零值密文以便在协议执行时使用。这种预处理的方式，将协议中比较耗时的加密步骤提前进行了处理，能够提高实际应用过程中的运行效率。同时，在实际的测试结果中也验证了这种预处理的高效性，当兴趣集合大小为212时，局域网环境中好友匹配时间仅为147ms。</p>
+</li>
+<li><p><strong>将所设计的协议成功应用到朋友发现系统的核心功能模块</strong>。 我们在现有密码算法库的基础上，对协议进行了实现并将其成功应用到朋友发现系统的核心功能模块：好友匹配。用户在系统初始化时选择自己的兴趣集合并加密后保存到用户数据中心，在使用好友匹配功能的时，执行我们所设计的集合交集安全两方计算协议，求得共同兴趣。同时，在整个应用过程中，用户双方的会话信息是通过SSL协议提供安全可信的通信服务，确保双方之间数据发送的正确性和安全性，没有发生任何隐私信息的泄漏。</p>
+</li>
+</ul>
+<h3 id="理论基础"><a href="#理论基础" class="headerlink" title="理论基础"></a><strong><font size=6>理论基础</font></strong></h3><p>支持本作品的主要理论基础是我们设计的一种高效的集合交集安全两方计算协议。协议只涉及两方参与计算，便能得到需要的结果，具有很好的隐私保护效果。</p>
+<h4 id="1）用户兴趣集合表示"><a href="#1）用户兴趣集合表示" class="headerlink" title="1）用户兴趣集合表示"></a>1）用户兴趣集合表示</h4><p>服务器拥有一组固定顺序的兴趣属性，每位用户通过一个位向量来表示自己的兴趣结合，即，对应位置的元素是用户的兴趣时，用户位向量对应位置的值为1，否则，为0。</p>
+<p><img src="/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%879.PNG"></p>
+<p>基于位向量的集合表示方法，集合交集的计算问题便可以转化为两向量的阵列乘法，具体操作为两位向量对应位置的值相乘，最后得到的向量即集合交集的位向量表示。</p>
+<p><img src="/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8710.PNG"></p>
+<h4 id="2）加法同态加密系统"><a href="#2）加法同态加密系统" class="headerlink" title="2）加法同态加密系统"></a>2）加法同态加密系统</h4><p>我们提出的集合的安全两方计算主要基于加法同态加密，同态性质是某些公钥加密系统所具有的重要性质，在安全多方计算中有重要应用。具有加法同态性质的加密系统除了具有普通公钥密码系统的性质以外，还具有以下性质：</p>
+<p><img src="/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8711.PNG"></p>
+<h4 id="3）协议流程"><a href="#3）协议流程" class="headerlink" title="3）协议流程"></a>3）协议流程</h4><p>整个协议共分为三步，最后Bob解密得到的结果即交集的位向量表示。协议时序图如下：</p>
+<p><img src="/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8712.PNG"></p>
+<h4 id="4）正确性证明"><a href="#4）正确性证明" class="headerlink" title="4）正确性证明"></a>4）正确性证明</h4><p>协议主要是要得到【陈列乘法】的计算形式，利用加法同态加密系统的主要性质，对Alice计算后的结果e向量，有：</p>
+<p><img src="/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8713.PNG"></p>
+<h4 id="5）安全性证明"><a href="#5）安全性证明" class="headerlink" title="5）安全性证明"></a>5）安全性证明</h4><p><img src="/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8714.PNG"></p>
+<h3 id="设计与实现"><a href="#设计与实现" class="headerlink" title="设计与实现"></a><strong><font size=6>设计与实现</font></strong></h3><h4 id="1）系统架构"><a href="#1）系统架构" class="headerlink" title="1）系统架构"></a>1）系统架构</h4><p><img src="/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8716.PNG"></p>
+<h4 id="2）主要功能"><a href="#2）主要功能" class="headerlink" title="2）主要功能"></a>2）主要功能</h4><p><img src="/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8717.PNG"></p>
+<p><img src="/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8718.PNG"></p>
+<h3 id="效率分析"><a href="#效率分析" class="headerlink" title="效率分析"></a><strong><font size=6>效率分析</font></strong></h3><h4 id="1）测试环境"><a href="#1）测试环境" class="headerlink" title="1）测试环境"></a>1）测试环境</h4><ul>
+<li><p>测试手段：对本系统测试手段主要是手工测试，模拟实际用户进行相关测试。</p>
+</li>
+<li><p>测试环境：测试环境为装有Android 7.0系统的华为Mate Pad BTV-W09。</p>
+</li>
+<li><p>硬件条件：处理器为海思 Kirin 950，处理器主频2.3GHz，4GB内存。</p>
+</li>
+<li><p>编程环境：客户端编程环境为Android Studio，利用Java语言进行开发。服务器编程环境为MyEclipse，利用Java语言及Servlet技术开发</p>
+</li>
+<li><p>服 务 器：服务器搭建在阿里云上，服务器系统版本为Cent OS 7</p>
+</li>
+<li><p>开 发 库：JPBC(The Java Pairing Based Cryptography Library)，java.math.BigInteger，java.security以及javax.crypto库；其中java.math.BigInteger库主要用于对大数的操作，java.security主要用于安全随机数的生成，javax.crypto主要用于密钥管理。</p>
+</li>
+</ul>
+<h4 id="2）测试结果"><a href="#2）测试结果" class="headerlink" title="2）测试结果"></a>2）测试结果</h4><p>我们首先用Java语言对协议进行了实现，并自己实现了两种加法同态加密算法——Paillier和ElGamal，我们详细的测试了两种方案，数据如下，协议的加密步骤均可提前处理，使用这种预处理的方式可以大大提高协议的执行效率。</p>
+<h5 id="a）Running-time-in-milliseconds-of-the-protocol-in-Paillier-Scheme"><a href="#a）Running-time-in-milliseconds-of-the-protocol-in-Paillier-Scheme" class="headerlink" title="a）Running time (in milliseconds) of the protocol in Paillier Scheme"></a>a）Running time (in milliseconds) of the protocol in Paillier Scheme</h5><p><img src="/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/PaillierRunTime.png"></p>
+<h5 id="b）Running-time-in-milliseconds-of-the-protocol-in-ElGamal-Scheme"><a href="#b）Running-time-in-milliseconds-of-the-protocol-in-ElGamal-Scheme" class="headerlink" title="b）Running time (in milliseconds) of the protocol in ElGamal Scheme"></a>b）Running time (in milliseconds) of the protocol in ElGamal Scheme</h5><p><img src="/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/ElGamalRunTime.png"></p>
+<p>实际情况中的使用效果：</p>
+<p><img src="/imgForArc/2019/07/%E5%9F%BA%E4%BA%8E%E7%94%A8%E6%88%B7%E5%85%B4%E8%B6%A3%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4%E7%9A%84%E6%9C%8B%E5%8F%8B%E5%8F%91%E7%8E%B0%E7%B3%BB%E7%BB%9F/%E5%B9%BB%E7%81%AF%E7%89%8721.PNG"></p>
+<h3 id="References"><a href="#References" class="headerlink" title="References"></a>References</h3><p>[1] O. Ruan, Z. Wang, <strong>J. Mi</strong> and M. Zhang, “New Approach to Set Representation and Practical Private Set-Intersection Protocols,” in <em>IEEE Access</em>, vol. 7, pp. 64897-64906, 2019. </p>
+<p>[2] E. De Cristofaro, G. Tsudik, “Practical private set intersection protocols with linear complexity”, <em>Proc. Int. Conf. Financial Cryptogr. Data Secur.</em>, pp. 143-159, 2010. </p>
+<p>[3] A. Abadi, S. Terzis, C. Dong, “VD-PSI: Verifiable delegated private set intersection on outsourced private datasets”, <em>Proc. Int. Conf. Financial Cryptogr. Data Secur.</em>, pp. 149-168, 2016. </p>
+<p>[4] Y. Huang, D. Evans, J. Katz, “Private set intersection: Are garbled circuits better than custom protocols?”, <em>Proc. 19th Netw. Distrib. Syst. Secur. Symp.</em>, pp. 1-15, 2012. </p>
+<p>[5] B. Pinkas, T. Schneider, M. Zohner, “Scalable private set intersection based on OT extension”, <em>ACM Trans. Privacy Secur.</em>, vol. 21, no. 2, pp. 1-35, Feb. 2018. </p>
+<p>[6] B. Pinkas, T. Schneider, M. Zohner, “Faster private set intersection based on OT extension”, <em>Proc. 23rd USENIX Secur. Symp.</em>, pp. 797-812, 2014.</p>
+
+      
+    </div>
+    
+    
+    <div class="article-category">
+      
+        <b>Categories:</b>
+        <a class="article-category-link" href="/categories/Information-Security/">Information Security</a>
+      
+      
+        <br/>
+      
+      
+        <b>Tags:</b>
+        <a class="article-tag-none-link" href="/tags/%E5%AE%89%E5%85%A8%E5%A4%9A%E6%96%B9%E8%AE%A1%E7%AE%97/" rel="tag">安全多方计算</a>, <a class="article-tag-none-link" href="/tags/%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4/" rel="tag">隐私保护</a>
+      
+    </div>
+    
+    
+  </div>
+</article>
+
+  
+<nav id="article-nav" class="article-nav">
+  
+    <a href="/2019/23/2019-11-23-%E5%85%B3%E4%BA%8E%E7%88%B1%E6%83%85/" id="article-nav-newer" class="article-nav-link-wrap newer">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          关于爱情
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/21/2019-05-12-JPBC/" id="article-nav-older" class="article-nav-link-wrap older">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">
+        
+          Getting started with JPBC programming
+        
+      </div>
+    </a>
+  
+</nav>
+
+
+
+
+
+
+    </div>
+  </div>
+  
+
+
+
+
+<div id="settings-container">
+  <div id="dark-mode">dark</div>
+  <div id="sans-font">sans</div>
+</div>
+<script type="text/javascript">
+let d=document,r=d.documentElement.style,f=r.setProperty.bind(r),l=localStorage,s=l.getItem('s')||(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches),n=l.getItem('n'),m=d.getElementById("dark-mode"),b=()=>{f('--bg-color','#fafafa');f('--code-bg-color','#f4f4f4');f('--text-color','#212121');f('--secondary-color','#808080');f('--tertiary-color','#b0b0b0');f('--link-color','#b5c8cf');f('--link-hover-color','#618794');f('--link-bg-color','#dae4e7');f('--selection-color','#dae4e7');m.innerHTML="dark"},c=()=>{f('--bg-color','#212121');f('--code-bg-color','#292929');f('--text-color','#fff');f('--secondary-color','#c0c0c0');f('--tertiary-color','#6e6e6e');f('--link-color','#4d6b75');f('--link-hover-color','#96b1bb');f('--link-bg-color','#5d828e');f('--selection-color','#acc1c9');m.innerHTML="light"},o=d.getElementById("sans-font"),e=()=>{f('--body-stack','"Lora", "Georgia", "Times New Roman", serif');o.innerHTML="sans"},g=()=>{f('--body-stack','"Lato", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "Verdana", sans-serif');o.innerHTML="serif"};m.onclick=()=>{if(s==2){s=1;l.setItem('s',s);c()}else{s=2;l.setItem('s',s);b()}};o.onclick=()=>{if(n==2){n=1;l.setItem('n',n);g()}else{n=2;l.setItem('n',n);e()}};if(!s){s=2;l.setItem('s',2)};if(s==1){c()};if(!n){n=2;l.setItem('n',2)};if(n==1){g()};
+</script>
+
+
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-195210058-2', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+</body>
+</html>

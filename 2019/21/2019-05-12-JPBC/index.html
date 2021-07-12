@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Getting started with JPBC programming | Hmmmi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+    <link rel="icon" href="/avatar-default.png">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+  
+  <meta name="description" content="The Java Pairing-Based Cryptography Library (JPBC) provides (i) A Port of the Pairing-Based Cryptography Library (PBC), library developed by Ben Lynn, to performs the mathematical operations underlyin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Getting started with JPBC programming">
+<meta property="og:url" content="https://hmmmi.github.io/2019/21/2019-05-12-JPBC/index.html">
+<meta property="og:site_name" content="Hmmmi">
+<meta property="og:description" content="The Java Pairing-Based Cryptography Library (JPBC) provides (i) A Port of the Pairing-Based Cryptography Library (PBC), library developed by Ben Lynn, to performs the mathematical operations underlyin">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/05/1.png">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/05/2.png">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/05/3.png">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/05/4.png">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/05/5.png">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/05/6.png">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2019/05/7.png">
+<meta property="article:published_time" content="2019-05-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-06-14T14:47:59.599Z">
+<meta property="article:author" content="Hmmmi">
+<meta property="article:tag" content="JPBC">
+<meta property="article:tag" content="Pairing-Based Cryptography">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hmmmi.github.io/imgForArc/2019/05/1.png"><meta name="generator" content="Hexo 5.1.1"></head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1 id="title">
+    <a href="/">Hmmmi</a>
+  </h1>
+  <nav>
+    
+    
+      
+      <a class="nav-link" href="/">Home</a>
+    
+      
+        <span class="nav-spacer">×</span>
+      
+      <a class="nav-link" href="/archives">Archives</a>
+    
+      
+        <span class="nav-spacer">×</span>
+      
+      <a class="nav-link" target="_blank" rel="noopener" href="https://github.com/hmmmi">GitHub</a>
+    
+    
+  </nav>
+</header>
+
+    <div id="content">
+      <article id="post-2019-05-12-JPBC" class="article article-type-post" itemprop="blogPost" itemscope>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h2 class="article-title" itemprop="headline name">
+      Getting started with JPBC programming
+    </h2>
+  
+
+
+        <div class="article-meta">
+          <time 
+		class="article-date" 
+		datetime="2019-05-20T16:00:00.000Z" 
+		itemprop="datePublished">
+	May 21, 2019
+
+</time>
+
+          
+            &nbsp;×&nbsp; <span class="article-word-count">693 words</span>
+            
+            &nbsp;×&nbsp; <span class="article-time-to-read">3 minutes</span>
+            
+          
+        </div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        <h3 id="0-Introduction"><a href="#0-Introduction" class="headerlink" title="0 Introduction"></a>0 Introduction</h3><br>
+
+<h4 id="0-0-概念"><a href="#0-0-概念" class="headerlink" title="0-0 概念"></a>0-0 概念</h4><ul>
+<li>JPBC, which is the short of Java Pairing-Based Cryptography Library.</li>
+<li>JPBC API 网址: <a target="_blank" rel="noopener" href="http://gas.dia.unisa.it/projects/jpbc">API</a></li>
+<li>基于配对的密码学，这里的配对指双线性配对，有关双线性对性质见《现代密码学》杨波，第四版，P107。</li>
+<li>Pairing for Cryptography definition from <a target="_blank" rel="noopener" href="http://gas.dia.unisa.it/projects/jpbc/docs/pairing.html#.XIxffOgzZPY">DEFINITION</a></li>
+</ul>
+<br>
+
+<h4 id="0-1-性质"><a href="#0-1-性质" class="headerlink" title="0-1 性质"></a>0-1 性质</h4><ul>
+<li><strong>主要性质：</strong> <strong>双线性(Billinearity)</strong> &amp; <strong>非退化性(Non-degeneracy)</strong></li>
+</ul>
+<p><img src="/imgForArc/2019/05/1.png"></p>
+<br>
+
+<h4 id="0-2-实例"><a href="#0-2-实例" class="headerlink" title="0-2 实例"></a>0-2 实例</h4><ul>
+<li><p><strong>Elements belonging to an algebraic structure (groups, rings and fields) are accessible through the Element interface that represents a mutable value.</strong></p>
+</li>
+<li><pre><code class="java">//Code Example:
+
+Field G1 = pairing.getG1();
+Element g = G1.newRandomElement();</code></pre>
+</li>
+<li><p>Pairing Parameters Generators, JPBC provides a set of interfaces and classes to generate and manage the parameters that describe a pairing setting. The PairingParametersGenerator interface is the starting point. Once an instance of such interface has been created then pairing parameters can be generated by invoking the generate method as follow:</p>
+</li>
+<li><pre><code class="java">import it.unisa.dia.gas.jpbc.PairingParametersGenerator;
+import it.unisa.dia.gas.jpbc.PairingParameters;
+
+               
+//Initialize the pairing parameters generator.
+ParametersGenerator parametersGenerator = ...
+           
+//Then, generate the parameters by invoking the generate method.
+PairingParameters params = parametersGenerator.generate();
+</code></pre>
+</li>
+</ul>
+<p><strong>注</strong>：JPBC提供的一些default配对参数，详见<a target="_blank" rel="noopener" href="http://gas.dia.unisa.it/projects/jpbc/docs/ecpg.html#.XIxouugzZPY">PARAMETERS</a></p>
+<br>
+
+<br>
+
+<h3 id="1-Interface"><a href="#1-Interface" class="headerlink" title="1 Interface"></a>1 Interface</h3><br>
+
+<h4 id="1-0-API"><a href="#1-0-API" class="headerlink" title="1-0 API"></a>1-0 API</h4><p>API详见<a target="_blank" rel="noopener" href="http://gas.dia.unisa.it/projects/jpbc/java-docs/api/index.html">API</a><br>重要的3个接口Pairing, Filed, Element</p>
+<p><img src="/imgForArc/2019/05/2.png"></p>
+<br>
+
+<h4 id="1-1-配对-Pairing"><a href="#1-1-配对-Pairing" class="headerlink" title="1-1 配对 Pairing"></a>1-1 配对 Pairing</h4><p><strong>默认实例化:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Pairing pairing = PairingFactory.getPairing(<span class="string">&quot;params.properties&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>随机实例化:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PairingParameters pg = <span class="keyword">new</span> TypeACurveGenerator(rBits, qBits).generate();</span><br><span class="line">pairing = PairingFactory.getPairing(pg);</span><br></pre></td></tr></table></figure>
+
+<p><strong>配对操作:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//There are Elements g1 and g2, Element a = e(g1, g2)</span></span><br><span class="line"></span><br><span class="line">Element a = pairing.pairing(g1, g2)</span><br></pre></td></tr></table></figure>
+
+<br>
+
+<h4 id="1-2-群-Field"><a href="#1-2-群-Field" class="headerlink" title="1-2 群 Field"></a>1-2 群 Field</h4><p>详细的解释是algebraic structure (groups, rings and fields)<br>实例化需通过Pairing对象，别问为什么，不知道为什么这么设计</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Return Zr</span></span><br><span class="line">Field Zr = pairing.getZr();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Return G1</span></span><br><span class="line">Field G1 = pairing.getG1();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Return G2</span></span><br><span class="line">Field G2 = pairing.getG2();</span><br><span class="line"></span><br><span class="line"><span class="comment">//Return GT</span></span><br><span class="line">Field GT = pairing.getGT();</span><br></pre></td></tr></table></figure>
+
+<br>
+
+<h4 id="1-3-元素-Element"><a href="#1-3-元素-Element" class="headerlink" title="1-3 元素 Element"></a>1-3 元素 Element</h4><p>Field中的元素</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Element e = pairing.getG2().newRandomElement();		<span class="comment">//随机</span></span><br><span class="line">Element out = pairing.pairing(e1, e2);</span><br></pre></td></tr></table></figure>
+
+<br>
+
+<h4 id="1-4-运算"><a href="#1-4-运算" class="headerlink" title="1-4 运算"></a>1-4 运算</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">add()		<span class="comment">//加</span></span><br><span class="line">mul()		<span class="comment">//乘</span></span><br><span class="line">mulZn()		<span class="comment">//乘 注意和mul的区别</span></span><br><span class="line">sub()		<span class="comment">//减</span></span><br><span class="line">div()		<span class="comment">//除</span></span><br><span class="line">twice()		<span class="comment">//this+this</span></span><br><span class="line">halve()		<span class="comment">//this/2</span></span><br><span class="line">invert()	<span class="comment">//乘法逆元</span></span><br><span class="line">square()	<span class="comment">//平方</span></span><br><span class="line">negate()	<span class="comment">//-this</span></span><br><span class="line">sqrt()		<span class="comment">//开平方</span></span><br><span class="line">pow()		<span class="comment">//乘方</span></span><br><span class="line">powZn()		<span class="comment">//乘方 注意和pow的区别</span></span><br></pre></td></tr></table></figure>
+
+<p>详细的用法查看详细的<a target="_blank" rel="noopener" href="http://gas.dia.unisa.it/projects/jpbc/java-docs/api/index.html">API</a></p>
+<br>
+
+<br>
+
+<h3 id="2-Configure"><a href="#2-Configure" class="headerlink" title="2 Configure"></a>2 Configure</h3><br>
+
+<h4 id="2-0-下载JAR包"><a href="#2-0-下载JAR包" class="headerlink" title="2-0 下载JAR包"></a>2-0 下载JAR包</h4><p>地址：<a target="_blank" rel="noopener" href="https://sourceforge.net/projects/jpbc">JPBC Source</a></p>
+<br>
+
+<p><img src="/imgForArc/2019/05/3.png"></p>
+<br>
+
+<p>点击Download后需要等待一段时间（有可能需要几分钟）</p>
+<p><img src="/imgForArc/2019/05/4.png"></p>
+<br>
+
+<p>解压后</p>
+<p><img src="/imgForArc/2019/05/5.png"></p>
+<ul>
+<li>jars文件夹中是相应需要使用的jar包，里面是已经编译好的字节码文件</li>
+<li>jpbc-*是相应的.java文件，so我们能get源码并追踪一些乘方计算为什么不那么耗时了</li>
+<li>params文件夹中是关于双线性对（或者说是椭圆曲线）的配置文件<ul>
+<li>里面有两个文件夹“curves”和“mm/ctl13”</li>
+<li>总的来说，这两个文件夹内都是一些.properties配置文件</li>
+<li>目前使用的是curves里面的一些配置文件</li>
+</ul>
+</li>
+<li>关于配对类型详解可以参考李发根的《基于配对的密码学》中P24</li>
+</ul>
+<br>
+
+<h4 id="2-1-配置过程"><a href="#2-1-配置过程" class="headerlink" title="2-1 配置过程"></a>2-1 配置过程</h4><p>在项目中根目录下新建lib文件夹，将所需要的jar文件拷贝到lib中</p>
+<p>然后右键 <strong>项目文件</strong> –&gt; <strong>Build Path</strong> –&gt; <strong>Configure Build Path</strong></p>
+<p><img src="/imgForArc/2019/05/6.png"></p>
+<br>
+
+<p>弹出一下对话框后点击Libraries</p>
+<p><img src="/imgForArc/2019/05/7.png"></p>
+<p>从刚刚的lib中Add JARs</p>
+
+      
+    </div>
+    
+    
+    <div class="article-category">
+      
+        <b>Categories:</b>
+        <a class="article-category-link" href="/categories/Information-Security/">Information Security</a>
+      
+      
+        <br/>
+      
+      
+        <b>Tags:</b>
+        <a class="article-tag-none-link" href="/tags/JPBC/" rel="tag">JPBC</a>, <a class="article-tag-none-link" href="/tags/Pairing-Based-Cryptography/" rel="tag">Pairing-Based Cryptography</a>
+      
+    </div>
+    
+    
+  </div>
+</article>
+
+  
+<nav id="article-nav" class="article-nav">
+  
+    <a href="/2019/17/2019-07-17-seekFriend/" id="article-nav-newer" class="article-nav-link-wrap newer">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          基于用户兴趣隐私保护的朋友发现系统
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/26/2019-04-26-%E4%BA%8C%E5%8D%81%E4%B8%80%E5%B2%81%E7%89%88%E6%9C%AC%E8%A1%A5%E4%B8%81%E6%9B%B4%E6%96%B0/" id="article-nav-older" class="article-nav-link-wrap older">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">
+        
+          二十一岁版本补丁更新
+        
+      </div>
+    </a>
+  
+</nav>
+
+
+
+
+
+
+    </div>
+  </div>
+  
+
+
+
+
+<div id="settings-container">
+  <div id="dark-mode">dark</div>
+  <div id="sans-font">sans</div>
+</div>
+<script type="text/javascript">
+let d=document,r=d.documentElement.style,f=r.setProperty.bind(r),l=localStorage,s=l.getItem('s')||(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches),n=l.getItem('n'),m=d.getElementById("dark-mode"),b=()=>{f('--bg-color','#fafafa');f('--code-bg-color','#f4f4f4');f('--text-color','#212121');f('--secondary-color','#808080');f('--tertiary-color','#b0b0b0');f('--link-color','#b5c8cf');f('--link-hover-color','#618794');f('--link-bg-color','#dae4e7');f('--selection-color','#dae4e7');m.innerHTML="dark"},c=()=>{f('--bg-color','#212121');f('--code-bg-color','#292929');f('--text-color','#fff');f('--secondary-color','#c0c0c0');f('--tertiary-color','#6e6e6e');f('--link-color','#4d6b75');f('--link-hover-color','#96b1bb');f('--link-bg-color','#5d828e');f('--selection-color','#acc1c9');m.innerHTML="light"},o=d.getElementById("sans-font"),e=()=>{f('--body-stack','"Lora", "Georgia", "Times New Roman", serif');o.innerHTML="sans"},g=()=>{f('--body-stack','"Lato", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "Verdana", sans-serif');o.innerHTML="serif"};m.onclick=()=>{if(s==2){s=1;l.setItem('s',s);c()}else{s=2;l.setItem('s',s);b()}};o.onclick=()=>{if(n==2){n=1;l.setItem('n',n);g()}else{n=2;l.setItem('n',n);e()}};if(!s){s=2;l.setItem('s',2)};if(s==1){c()};if(!n){n=2;l.setItem('n',2)};if(n==1){g()};
+</script>
+
+
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-195210058-2', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+</body>
+</html>

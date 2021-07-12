@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Fragment嵌套ViewPager | Hmmmi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+    <link rel="icon" href="/avatar-default.png">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+  
+  <meta name="description" content="主Fragment嵌套ViewPager，子Fragment在主Fragment内滑动，首次显示后，再次进入子Fragment显示空白。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fragment嵌套ViewPager">
+<meta property="og:url" content="https://hmmmi.github.io/2020/09/2020-09-09-Fragment%E5%B5%8C%E5%A5%97ViewPager/index.html">
+<meta property="og:site_name" content="Hmmmi">
+<meta property="og:description" content="主Fragment嵌套ViewPager，子Fragment在主Fragment内滑动，首次显示后，再次进入子Fragment显示空白。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2020/09/getFragmentManager.png">
+<meta property="og:image" content="https://hmmmi.github.io/imgForArc/2020/09/getChildFragmentManager.png">
+<meta property="article:published_time" content="2020-09-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-21T09:44:11.869Z">
+<meta property="article:author" content="Hmmmi">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hmmmi.github.io/imgForArc/2020/09/getFragmentManager.png"><meta name="generator" content="Hexo 5.1.1"></head>
+
+<body>
+  <div id="wrapper">
+    <header id="header">
+  <h1 id="title">
+    <a href="/">Hmmmi</a>
+  </h1>
+  <nav>
+    
+    
+      
+      <a class="nav-link" href="/">Home</a>
+    
+      
+        <span class="nav-spacer">×</span>
+      
+      <a class="nav-link" href="/archives">Archives</a>
+    
+      
+        <span class="nav-spacer">×</span>
+      
+      <a class="nav-link" target="_blank" rel="noopener" href="https://github.com/hmmmi">GitHub</a>
+    
+    
+  </nav>
+</header>
+
+    <div id="content">
+      <article id="post-2020-09-09-Fragment嵌套ViewPager" class="article article-type-post" itemprop="blogPost" itemscope>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h2 class="article-title" itemprop="headline name">
+      Fragment嵌套ViewPager
+    </h2>
+  
+
+
+        <div class="article-meta">
+          <time 
+		class="article-date" 
+		datetime="2020-09-08T16:00:00.000Z" 
+		itemprop="datePublished">
+	September 9, 2020
+
+</time>
+
+          
+            &nbsp;×&nbsp; <span class="article-word-count">172 words</span>
+            
+            &nbsp;×&nbsp; <span class="article-time-to-read">1 minute</span>
+            
+          
+        </div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+      
+        <h4 id="1-问题描述"><a href="#1-问题描述" class="headerlink" title="1. 问题描述"></a>1. 问题描述</h4><p>主Fragment嵌套ViewPager，子Fragment在主Fragment内滑动，首次显示后，再次进入子Fragment显示空白。</p>
+<h4 id="2-问题原因"><a href="#2-问题原因" class="headerlink" title="2. 问题原因"></a>2. 问题原因</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">String[] titles = <span class="keyword">new</span> String[]&#123;<span class="string">&quot;填写问题&quot;</span>, <span class="string">&quot;问题位置&quot;</span>&#125;;</span><br><span class="line">List&lt;Fragment&gt; fragments = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">fragments.add(ProblemDetailFragment.getInstance());</span><br><span class="line">fragments.add(ProblemLocationFragment.getInstance());</span><br><span class="line"></span><br><span class="line">m_ReportAdapter = <span class="keyword">new</span> FragmentPagerAdapter(getChildFragmentManager(), fragments);</span><br><span class="line">m_ReportViewPager.setAdapter(m_ReportAdapter);</span><br><span class="line">m_ReportTabLayout.setupWithViewPager(m_ReportViewPager);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; titles.length; i++)</span><br><span class="line">&#123;</span><br><span class="line">    m_ReportTabLayout.getTabAt(i).setText(titles[i]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>row5: 我们在new FragmentPagerAdapter时需要传入FragmentManager实例，一般做法都是使用getFragmentManager()方法。</p>
+<p>getFragmentManager()接口的描述如下：</p>
+<p><img src="/imgForArc/2020/09/getFragmentManager.png" alt="getFragmentManager"></p>
+<p>返回的是父容器的FragmentManager，而ViewPager里的Fragment显然不是直接处于父容器下。</p>
+<h4 id="3-解决办法"><a href="#3-解决办法" class="headerlink" title="3. 解决办法"></a>3. 解决办法</h4><p>使用getChildFragmentManager()方法。</p>
+<p>“ Managin Fragments <strong><em>inside</em></strong> of this Fragment.</p>
+<p><img src="/imgForArc/2020/09/getChildFragmentManager.png" alt="getChildFragmentManager"></p>
+
+      
+    </div>
+    
+    
+    <div class="article-category">
+      
+        <b>Categories:</b>
+        <a class="article-category-link" href="/categories/Android/">Android</a>
+      
+      
+      
+    </div>
+    
+    
+  </div>
+</article>
+
+  
+<nav id="article-nav" class="article-nav">
+  
+    <a href="/2020/11/2020-09-11-View%E4%BA%8B%E4%BB%B6%E5%88%86%E5%8F%91%E6%9C%BA%E5%88%B6/" id="article-nav-newer" class="article-nav-link-wrap newer">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          View事件冲突——事件分发机制
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/03/2020-08-03-%E6%88%91%E4%BB%AC%E7%9C%8B%E4%B8%8D%E8%A7%81%E7%9A%84%E4%B8%96%E7%95%8C/" id="article-nav-older" class="article-nav-link-wrap older">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">
+        
+          我们看不见的世界
+        
+      </div>
+    </a>
+  
+</nav>
+
+
+
+
+
+
+    </div>
+  </div>
+  
+
+
+
+
+<div id="settings-container">
+  <div id="dark-mode">dark</div>
+  <div id="sans-font">sans</div>
+</div>
+<script type="text/javascript">
+let d=document,r=d.documentElement.style,f=r.setProperty.bind(r),l=localStorage,s=l.getItem('s')||(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches),n=l.getItem('n'),m=d.getElementById("dark-mode"),b=()=>{f('--bg-color','#fafafa');f('--code-bg-color','#f4f4f4');f('--text-color','#212121');f('--secondary-color','#808080');f('--tertiary-color','#b0b0b0');f('--link-color','#b5c8cf');f('--link-hover-color','#618794');f('--link-bg-color','#dae4e7');f('--selection-color','#dae4e7');m.innerHTML="dark"},c=()=>{f('--bg-color','#212121');f('--code-bg-color','#292929');f('--text-color','#fff');f('--secondary-color','#c0c0c0');f('--tertiary-color','#6e6e6e');f('--link-color','#4d6b75');f('--link-hover-color','#96b1bb');f('--link-bg-color','#5d828e');f('--selection-color','#acc1c9');m.innerHTML="light"},o=d.getElementById("sans-font"),e=()=>{f('--body-stack','"Lora", "Georgia", "Times New Roman", serif');o.innerHTML="sans"},g=()=>{f('--body-stack','"Lato", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "Verdana", sans-serif');o.innerHTML="serif"};m.onclick=()=>{if(s==2){s=1;l.setItem('s',s);c()}else{s=2;l.setItem('s',s);b()}};o.onclick=()=>{if(n==2){n=1;l.setItem('n',n);g()}else{n=2;l.setItem('n',n);e()}};if(!s){s=2;l.setItem('s',2)};if(s==1){c()};if(!n){n=2;l.setItem('n',2)};if(n==1){g()};
+</script>
+
+
+
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-195210058-2', 'auto');
+ga('send', 'pageview');
+</script>
+
+
+</body>
+</html>
